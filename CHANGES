@@ -1,4 +1,12 @@
-0.5-devel
+0.6-devel
+    + Sort order in tables is now preserved.
+    + Added column chooser for Explore mode, saved with view.
+    + Column widths saved with view via new plugin.
+    + Added tooltips to table values.
+    + Added wiki plugin for public notes for cubes and views.
+    + Menu buttons now require click to activate.
+    + Fixed a few UI glitches. 
+0.5
     + Removed the "global shared views" concept.
     + Experimental Cubes proxy (with ACLs).
     + Initial version of cache system.
