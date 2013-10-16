@@ -57,5 +57,17 @@ class CubesView(CubesViewerModel):
     class Meta:
         ordering = ['name']
 
+class Note(CubesViewerModel):
+    """
+    Saved Cubes View
+    """
+    key = models.CharField("Key", max_length=200)
+    data = models.TextField()
+    update_user = models.ForeignKey(User)
 
+    def __unicode__(self):
+        return str(self.key)
+
+    class Meta:
+        ordering = ['key']
 

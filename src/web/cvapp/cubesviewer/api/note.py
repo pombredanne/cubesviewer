@@ -1,4 +1,4 @@
-# CubesViewer  
+# CubesViewer
 #
 # Copyright (c) 2012-2013 Jose Juan Montes, see AUTHORS for more details
 #
@@ -11,11 +11,11 @@
 #
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # If your version of the Software supports interaction with it remotely through
 # a computer network, the above copyright notice and this permission notice
 # shall be accessible to all users.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,25 +25,45 @@
 # SOFTWARE.
 
 
-from django.contrib import admin
+from piston.handler import BaseHandler
+from django.db.models import Q
+
+from cubesviewer.models import Note
+
+class NoteSaveHandler(BaseHandler):
+
+    allowed_methods = ('POST')
+
+    def create(self, request, *args, **kwargs):
+
+        tnote = None
+        
+        tnotes = Note.objects.filter(key = request.POST["key"])
+        if (len(tnotes) > 0):
+            tnote = tnotes[0]
+        else:
+            tnote = Note()
+            tnote.key = request.POST["key"]
+        
+        tnote.data = request.POST["data"]
+        tnote.update_user = request.user
+        
+        # Update or delete as necessary
+        if (str(request.POST["data"]) == ""):
+            tnote.delete()
+        else:
+            tnote.save()
+
+        return tnote
 
 
-from django.contrib import admin
-from cubesviewer.models import CubesView, Note
+class NoteViewHandler(BaseHandler):
 
-# Admin interface customization
-class CubesViewAdmin(admin.ModelAdmin):
-    model = CubesView
-    extra = 1
-    #list_display = ('dc', 'title', 'mac_address', 'var', 'state')
-    # list_filter = ['var'] # seems that foreignkeys don't work for list filters
-    #inlines = [ClientHostMappingInline, InfrastructureHostMappingInline]
+    allowed_methods = ('GET')
+    exclude = ()
 
-class NoteAdmin(admin.ModelAdmin):
-    model = Note
-    
+    def read(self, request, *args, **kwargs):
 
-# Register models with the administration interface
-admin.site.register(CubesView)
-admin.site.register(Note)
+        note = Note.objects.filter(key=kwargs['pk'])
+        return note
 

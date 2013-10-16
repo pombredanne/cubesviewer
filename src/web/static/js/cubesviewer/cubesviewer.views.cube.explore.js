@@ -115,7 +115,7 @@ function cubesviewerViewCubeExplore() {
 				
 				if (dimension.hierarchies.length > 1) {
 					$(dimension.hierarchies).each(function(idx,hi) {
-						drillElements = drillElements + '<li><a href="#">' + hi.label + 
+						drillElements = drillElements + '<li><a href="#" onclick="return false;">' + hi.label + 
 						'</a><ul class="drillList" style="width: 160px; z-index: 9999;">';
 						$(hi.levels).each(function(idx, el) { 
 							var level = dimension.getLevel(el);
@@ -395,6 +395,12 @@ function cubesviewerViewCubeExplore() {
 		
 	},
 
+	this.columnTooltipAttr = function(column) {
+		return function (rowId, val, rawObject) {
+			return 'title="' + column + ' = ' + val + '"';
+		}; 
+	};
+	
 	/*
 	 * Show received summary
 	 */ 
@@ -420,8 +426,9 @@ function cubesviewerViewCubeExplore() {
 				index : column,
 				align : "right",
 				sorttype : "number",
-				width : 105,
+				width : cubesviewer.views.cube.explore.defineColumnWidth(view, column, 95),
 				formatter: 'number',  
+				cellattr: this.columnTooltipAttr(column),
 				formatoptions: { decimalSeparator:".", thousandsSeparator: " ", decimalPlaces: 2 }
 			});
 			dataTotals[column] = data.summary[column];
@@ -448,7 +455,7 @@ function cubesviewerViewCubeExplore() {
 				name : "key" + i,
 				index : "key" + i,
 				align : "left",
-				width: 130
+				width: cubesviewer.views.cube.explore.defineColumnWidth(view, "key" + i, 130)
 			});
 		}
 		if (view.params.drilldown.length == 0) {
@@ -457,7 +464,7 @@ function cubesviewerViewCubeExplore() {
 				name : "key" + 0,
 				index : "key" + 0,
 				align : "left",
-				width: 110
+				width: cubesviewer.views.cube.explore.defineColumnWidth(view, "key" + 0, 110)
 			});
 		}
 		
@@ -484,14 +491,14 @@ function cubesviewerViewCubeExplore() {
 							userData : dataTotals,
 							datatype : "local",
 							height : 'auto',
-							rowNum : 15,
-							rowList : [ 15, 30, 50, 100 ],
+							rowNum : cubesviewer.options.pagingOptions[0],
+							rowList : cubesviewer.options.pagingOptions,
 							colNames : colNames,
 							colModel : colModel,
 							pager : "#summaryPager-" + view.id,
-							sortname : 'key',
+							sortname : cubesviewer.views.cube.explore.defineColumnSort(view, ["key", "desc"])[0],
 							viewrecords : true,
-							sortorder : "desc",
+							sortorder : cubesviewer.views.cube.explore.defineColumnSort(view, ["key", "desc"])[1],
 							footerrow : true,
 							userDataOnFooter : true,
 							forceFit : false,
@@ -526,15 +533,51 @@ function cubesviewerViewCubeExplore() {
 															.get(0).idsOfSelectedRows[i],
 													false);
 								}
-							}
+								// Call hook
+								view.cubesviewer.views.cube.explore.onTableLoaded (view);
+							},
+							resizeStop: view.cubesviewer.views.cube.explore._onTableResize (view),
+							onSortCol: view.cubesviewer.views.cube.explore._onTableSort (view), 
 
 						});
 
 		this.cubesviewer.views.cube._adjustGridSize(); // remember to copy also the window.bind-resize init
 
+		
 	};
 
-
+	this._onTableSort = function (view) {
+		return function (index, iCol, sortorder) {
+			view.cubesviewer.views.cube.explore.onTableSort (view, index, iCol, sortorder);
+		}
+	}
+	
+	this._onTableResize = function (view) {
+		return function(width, index) {
+			view.cubesviewer.views.cube.explore.onTableResize (view, width, index);
+		};
+	};
+	
+	this.onTableResize = function (view, width, index) {
+		// Empty implementation, to be overrided
+		//alert("resize column " + index + " to " + width + " pixels");
+	};
+	this.onTableLoaded = function (view) {
+		// Empty implementation, to be overrided
+	};
+	this.onTableSort = function (view, key, index, iCol, sortorder) {
+		// Empty implementation, to be overrided
+	};
+	
+	this.defineColumnWidth = function (view, column, vdefault) {
+		// Simple implementation. Overrided by the columns plugin.
+		return vdefault;
+	};
+	this.defineColumnSort = function (view, vdefault) {
+		// Simple implementation. Overrided by the columns plugin.
+		return vdefault;
+	};
+		
 
 	this.drawDateFilter = function(view, datefilter, container) {
 
@@ -627,7 +670,7 @@ function cubesviewerViewCubeExplore() {
 		
 		var piece = view.cubesviewer.views.cube.explore.drawInfoPiece(
 			$(view.container).find('.cv-view-viewinfo-drill'), "#000000", 200, true,
-			'<span class="ui-icon ui-icon-info"></span> <span style="color: white;"><b>Cube:</b> ' + view.cube.label + '</span>' 
+			'<span class="ui-icon ui-icon-info"></span> <span style="color: white;" class="cv-view-viewinfo-cubename"><b>Cube:</b> ' + view.cube.label + '</span>' 
 		);
 	
 		$(view.params.drilldown).each(function(idx, e) {
