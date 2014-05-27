@@ -39,8 +39,7 @@ function cubesviewerViewCube () {
 			"mode" : "explore",
 			
 			"drilldown" : [],
-			"cuts" : [],
-			"datefilters" : [],
+			"cuts" : []
 			
 		});
 		
@@ -80,27 +79,29 @@ function cubesviewerViewCube () {
 	 */
 	this.onViewDraw = function(event, view) {
 		
-		if ($(".cv-view-viewdata", $(view.container)).size() == 0) {
+		if ($(".cv-view-viewdata", view.container).size() == 0) {
 
 			$(view.container).empty();
-			$(view.container).append('<div class="cv-view-viewmenu"></div>');
-			$(view.container).append('<div class="cv-view-viewinfo"></div>');
-			$(view.container).append('<div class="cv-view-viewdata" style="clear: both;"></div>');
-			$(view.container).append('<div class="cv-view-viewfooter" style="clear: both;"></div>');
+			$(view.container).append(
+					'<div class="cv-view-panel">' + 
+					'<div class="cv-view-viewmenu"></div>' +
+					'<div class="cv-view-viewinfo"></div>' +
+					'<div class="cv-view-viewdata" style="clear: both;"></div>' +
+					'<div class="cv-view-viewfooter" style="clear: both;"></div>' +
+					'</div>'
+			);
 			
 		}
 		
 		// Check if the model/cube is loaded.
 		if (view.cube == null) {
-			$(view.container).find('.cv-view-viewdata').empty().append(
-					'<h3>Cube View</h3><div><i>Cannot present cube view: could not load model or cube <b>' + view.params.cubename + '</b>.</i></div>'
-			);
+			cubesviewer.views.showFatal (view.container, 'Cannot present cube view: could not load model or cube <b>' + view.params.cubename + '</b>.');
 			return;
 		}
 		
 		// Menu toolbar
 		$(view.container).find('.cv-view-viewmenu').empty().append(
-			'<div style="float: right; z-index: 9990; "><div class="cv-view-toolbar ui-widget-header ui-corner-all" style="display: inline-block;">' +
+			'<div style="float: right; z-index: 9990; margin-bottom: 5px;"><div class="cv-view-toolbar ui-widget-header ui-corner-all" style="display: inline-block; padding: 2px;">' +
 			'</div></div>'
 		);
 		
@@ -114,8 +115,24 @@ function cubesviewerViewCube () {
 	 */
 	this._initMenu = function (view, buttonSelector, menuSelector) {
 		//view.cubesviewer.views.initMenu('.panelbutton', '.cv-view-menu-panel');
-		$('.cv-view-toolbar', $(view.container)).find(buttonSelector).click(function() {
+		$('.cv-view-toolbar', $(view.container)).find(buttonSelector).on("click mouseenter", function(ev) {
 
+			if (ev.type == "mouseenter") {
+				if (! $('.cv-view-menu', view.container).is(":visible")) {
+					// Only if a menu was open we allow mouseenter to open a menu
+					return;
+				}
+			}
+			
+			if (ev.type == "click") {
+				if ($('.cv-view-menu', view.container).is(":visible")) {
+					// Hide the menu and return
+					$('.cv-view-menu', view.container).hide();
+					return;
+				}
+			}
+			
+			// Hide all menus (only one context menu open at once)
 			$('.cv-view-menu').hide();
 
 			var menu = $(menuSelector, $(view.container));
@@ -157,119 +174,25 @@ function cubesviewerViewCube () {
 	this._adjustGridSize = function() {
 
 		// TODO: use appropriate container width!
-		var newWidth = $(window).width() - 350;
+		//var newWidth = $(window).width() - 350;
 		
-		$(".ui-jqgrid-btable").each(function(idx, el) {
-			var currentWidth = $(el).width();
-			if (newWidth < 700) newWidth = 700;
+		$(".cv-view-panel").each(function (idx, e) {
+		
+			$(".ui-jqgrid-btable", e).each(function(idx, el) {
+				
+				$(el).setGridWidth(cubesviewer.options.tableResizeHackMinWidth);
+				
+				var newWidth = $( e ).innerWidth() - 20;
+				//var newWidth = $( el ).parents(".ui-jqgrid").first().innerWidth();
+				if (newWidth < cubesviewer.options.tableResizeHackMinWidth) newWidth = cubesviewer.options.tableResizeHackMinWidth;
 
-			//if ((currentWidth > newWidth) /*|| (currentWidth < newWidth - 50) */ ) {
 				$(el).setGridWidth(newWidth);
-			//}
-		});
-	};
-	
-	/*
-	 * Composes a filter with appropriate syntax and time grain from a
-	 * datefilter
-	 */ 
-	this.datefilterValue = function(datefilter) {
-
-		var date_from = null;
-		var date_to = null;
-
-		if (datefilter.mode.indexOf("auto-") == 0) {
-			if (datefilter.mode == "auto-last1m") {
-				date_from = new Date();
-				date_from.setMonth(date_from.getMonth() - 1);
-			} else if (datefilter.mode == "auto-last3m") {
-				date_from = new Date();
-				date_from.setMonth(date_from.getMonth() - 3);
-			} else if (datefilter.mode == "auto-last6m") {
-				date_from = new Date();
-				date_from.setMonth(date_from.getMonth() - 6);
-			} else if (datefilter.mode == "auto-last12m") {
-				date_from = new Date();
-				date_from.setMonth(date_from.getMonth() - 12);
-			} else if (datefilter.mode == "auto-january1st") {
-				date_from = new Date();
-				date_from.setMonth(0);
-				date_from.setDate(1);
-			} else if (datefilter.mode == "auto-yesterday") {
-				date_from = new Date();
-				date_from.setDate(date_from.getDate() - 1);
-				date_to = new Date();
-                date_to.setDate(date_from.getDate());
-			}
-
-		} else if (datefilter.mode == "custom") {
-			if ((datefilter.date_from != null) && (datefilter.date_from != "")) {
-				date_from = new Date(datefilter.date_from);
-			}
-			if ((datefilter.date_to != null) && (datefilter.date_to != "")) {
-				date_to = new Date(datefilter.date_to);
-			}
-		}
-
-		if ((date_from != null) || (date_to != null)) {
-			var datefiltervalue = "";
-			if (date_from != null)
-				datefiltervalue = datefiltervalue
-						+ this._datefiltercell(datefilter, date_from);
-			datefiltervalue = datefiltervalue + "-";
-			if (date_to != null)
-				datefiltervalue = datefiltervalue
-						+ this._datefiltercell(datefilter, date_to);
-			return datefiltervalue;
-		} else {
-			return null;
-		}
-
-	};
-
-	this._datefiltercell = function(datefilter, tdate) {
-
-		var values = [];
-		
-		var dimensionparts = cubesviewer.model.getDimensionParts(datefilter.dimension);
-		for (var i = 0; i < dimensionparts.hierarchy.levels.length; i++) {
-			var levelname = dimensionparts.hierarchy.levels[i];
-			var level = dimensionparts.dimension.getLevel(levelname);
+				
+			});
 			
-			var field = level.getInfo("cv-datefilter-field");
-			if (field == "year") {
-				values.push(tdate.getFullYear());
-			} else if (field == "month") {
-				values.push(tdate.getMonth() + 1);
-			} else if (field == "quarter") {
-				values.push((Math.floor(tdate.getMonth() / 3) + 1));
-			} else if (field == "week") {
-				values.push(this._weekNumber(tdate));
-			} else if (field == "day") {
-				values.push(tdate.getDate());
-			} else {
-				cubesviewer.alert ("Wrong configuration of model: datefilter field '" + field + "' is invalid.");
-			}
-		}
+		});
 		
-		return values.join(',');
-		
-		return tdate.getFullYear() + ","
-				+ (Math.floor(tdate.getMonth() / 3) + 1) + ","
-				+ (tdate.getMonth() + 1);
-	};	
-	
-	this._weekNumber = function(d) {
-	    // Copy date so don't modify original
-	    d = new Date(d);
-	    d.setHours(0,0,0);
-	    // Get first day of year
-	    var yearStart = new Date(d.getFullYear(),0,1);
-	    // Calculate full weeks to nearest Thursday
-	    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7)
-	    // Return array of year and week number
-	    return weekNo;
-	};	
+	};
 	
 	/*
 	 * Builds Cubes Server query parameters based on current view values.
@@ -288,27 +211,39 @@ function cubesviewerViewCube () {
 				drilldown.splice(0, 0, view.params.xaxis);
 			}
 
+			// Preprocess
+			for (var i = 0; i < drilldown.length; i++) {
+				var parts  = cubesviewer.model.getDimensionParts(drilldown[i]);
+				drilldown[i] = parts.fullDrilldownValue;
+			}
+			
 			// Include drilldown array
 			if (drilldown.length > 0)
 				params["drilldown"] = drilldown;
 		}
 
-		// Include cuts and datefilters
-		var cuts = [];
-		$(view.params.cuts).each(function(idx, e) {
-			cuts.push(e.dimension + ":" + e.value);
-		});
-		$(view.params.datefilters).each(function(idx, e) {
-			var datefiltervalue = view.cubesviewer.views.cube.datefilterValue(e);
-			if (datefiltervalue != null) {
-				cuts.push(e.dimension + ":" + datefiltervalue);
-			}
-		});
+		var cuts = cubesviewer.views.cube.buildQueryCuts(view);
+		
 		// Join different cut conditions
 		if (cuts.length > 0)
 			params["cut"] = cuts.join("|");
 
 		return params;
+	};
+	
+	/*
+	 * Builds Query Cuts
+	 */
+	this.buildQueryCuts = function(view) {
+		
+		// Include cuts
+		var cuts = [];
+		$(view.params.cuts).each(function(idx, e) {
+			cuts.push(e.dimension + ":" + e.value);
+		});
+		
+		return cuts;
+		
 	};
 
 };

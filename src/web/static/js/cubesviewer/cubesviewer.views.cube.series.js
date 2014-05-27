@@ -95,7 +95,7 @@ function cubesviewerViewCubeSeries() {
 		
 		// Add drill menu
 		
-		var drillElements = cubesviewer.views.cube.explore.getDrillElementsList(view, "cv-view-series-setxaxis");
+		var drillElements = cubesviewer.views.cube.explore.getDrillElementsList(view, "cv-view-series-setxaxis", true);
 		
 		/*
 		$(cube.dimensions).each(function(idx, e) {
@@ -234,8 +234,6 @@ function cubesviewerViewCubeSeries() {
 	 */
 	this.drawInfo = function(view) {
 		
-		view.cubesviewer.views.cube.explore.drawInfo(view);
-		
 		cubesviewer.views.cube.explore.drawInfoPiece(
 			$(view.container).find('.cv-view-viewinfo-extra'), "#ccccff", 350, true,
 			'<span class="ui-icon ui-icon-zoomin"></span> <b>Measure:</b> ' + ( (view.params.yaxis != null) ? view.params.yaxis : "<i>None</i>") 
@@ -301,10 +299,11 @@ function cubesviewerViewCubeSeries() {
 	        sortname: cubesviewer.views.cube.explore.defineColumnSort(view, ["key", "desc"])[0], 
 	        viewrecords: true, 
 	        sortorder: cubesviewer.views.cube.explore.defineColumnSort(view, ["key", "desc"])[1], 
-	        footerrow: true,
+	        //footerrow: true,
 	        userDataOnFooter: true,
 	        forceFit: false,
 	        shrinkToFit: false,
+	        width: cubesviewer.options.tableResizeHackMinWidth,
 	        //multiselect: true,
 	        //multiboxonly: true,
 			

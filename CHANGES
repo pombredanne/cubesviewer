@@ -1,4 +1,34 @@
-0.6-devel
+0.10
+    
+0.9
+    + Last version supporting cubes 0.10.x.
+    + Fix dimensionfilter bug causing wrong values to
+      be selected when updating from the current filter.
+    + Added Google Analityics events plugin.
+0.8
+    + Charts now save view configuration (status and disabledseries).
+    + New rangefilter plugin (closes #21).
+    + Added support for a cv-ignore option in the model for dimensions.
+    + Separated datefilter as a plugin (closes #8).
+    + Cutting over a drilled dimension no longer removes the drill.
+    + Added shortcuts (select all) and drilldown from filters.
+    + Menus now open on hover if already open. 
+    + Charts now using nvd3.js!
+0.7
+    + Always send dimension level for drilldown (solves
+      issue about single-point cut + drilldown combination)
+    + Updated the pure-html examples (embedded views).  
+    + Ajax global error handler is no longer used.
+    + More user friendly error handling if server not available.
+    + Fixed table resizing not fitting parent.
+    + Added week information to datepickers.
+    + Added measures to facts view.
+0.6
+    + Added facts view (and support for column size saving).
+    + Added dimension filter icons (shortcuts) to info pieces.
+    + Fixed bug causing wrong hierarchy name to be displayed
+    + Added the dimensionfilter plugin, which introduces a
+      more advanced filtering interface.
     + Sort order in tables is now preserved.
     + Added column chooser for Explore mode, saved with view.
     + Column widths saved with view via new plugin.

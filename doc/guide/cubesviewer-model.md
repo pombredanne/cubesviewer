@@ -16,14 +16,14 @@ when refering to Cubes, Dimensions, Hierarchies, Levels and other Cubes objects.
 Date Filtering
 --------------
 
-CubesViewer has an "Add Date Filter" option that shows a special cut filter for date dimensions. In order for it
+CubesViewer has a "Date Filter" option that shows a special cut filter for date dimensions. In order for it
 to work, you need to add information to your model.  
 
 1. For each date dimension, add an "info" attribute called "cv-datefilter" with "true" value.
 2. Optionally, also add an "info" attribute "cv-datefilter-hierarchy" if your desired date 
    filtering hierarchy is not "default".
 3. For each *level* involved in your date filtering, add an "info" attribute "cv-datefilter-field" 
-   identifying the unit of date value (one of "year", "quarter", "month" or "week").   
+   identifying the unit of date value (one of "year", "quarter", "month", "week" or "day").   
 
 This is an example dimension "date_created" showing this configuration:
  
@@ -77,3 +77,55 @@ This is an example dimension "date_created" showing this configuration:
         },
         ...  
 ```
+
+Range Filtering
+---------------
+
+CubesViewer has a "Range Filter" option that shows a special cut filter for ranges. This can be applied
+to simple dimensions which *keys* are sortable.
+
+In order for this to work, you need to add information to your model.  
+
+1. For each range dimension, add an "info" attribute called "cv-rangefilter" with "true" value.
+2. Optionally, also add an "info" attribute "cv-rangefilter-slider" if you wish the filter
+   to include a slider. This attribute must be a dictionary with "min", "max" and "step" keys, as shown
+   in the example below:
+
+This is an example dimension "year" showing this configuration:
+ 
+```
+    "dimensions": [ 
+        {
+            "name": "date_year",
+            "label": "Year",
+            "info": {
+                "cv-rangefilter": true,
+                "cv-rangefilter-slider": {
+                    "min": 2006, 
+                    "max": 2012, 
+                    "step": 1
+                }
+            }
+        },
+        ...
+```
+
+Ignored Dimensions
+------------------
+
+You can make CubesViewer ignore a dimension by adding a "cv-ignore" information key as shown 
+in the example below. Ignored dimensions will not be shown by CubesViewer.
+
+```
+    "dimensions": [
+        {
+            "name": "company",
+            "label": "Company",
+            "info": {
+                "cv-ignore": true
+            }
+        },
+        ...
+```
+
+

@@ -55,8 +55,12 @@ function cubesviewerGui () {
 		for ( var i = 0; (i < this.views.length)
 				&& (this.views[i].id != view.id); i++)
 			;
-		this.views.splice(i, 1);
+		
 		$('#' + view.id).remove();
+		this.views.splice(i, 1);
+
+		cubesviewer.views.destroyView (view);
+		
 	};
 
 	// Adds a new clean view for a cube
@@ -116,7 +120,7 @@ function cubesviewerGui () {
 			'<div class="cv-gui-cubesview" ><h3 class="sorthandle">' +
 			'<span style="float: right; margin-left: 20px;" class="cv-gui-closeview ui-icon ui-icon-close"></span>' +
 			'<span class="cv-gui-container-name" style="margin-left: 30px; margin-right: 20px;">' + /* view.name + */ '</span> <span style="float: right;" class="cv-gui-container-state"></span>' + /* viewstate + */ 
-			'</h3><div class="cv-gui-viewcontent" style="padding: 1em; overflow: hidden;"></div></div>'
+			'</h3><div class="cv-gui-viewcontent" style="overflow: hidden;"></div></div>'
 		);
 		
 		// Configure collapsible
@@ -267,6 +271,7 @@ function cubesviewerGui () {
 	this.showAbout = function() {
 		this.cubesviewer.alert(
 				"CubesViewer - Version " + this.cubesviewer.version + "\n" +
+				"https://github.com/jjmontesl/cubesviewer/\n" +
 				"\n" +
 				"Written by José Juan Montes\n" +
 				"2012-2013\n"

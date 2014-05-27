@@ -4,61 +4,76 @@ CubesViewer - OLAP Visual Viewer and Explore Tool
 About
 -----
 
+
 CubesViewer is a visual, web-based tool application for exploring and analyzing
 OLAP databases served by the Cubes OLAP Framework.
 
-This tool allows users to inspect the different dimensions, measures and
-aggregated data in different ways, allowing you to build tables and charts
-based on analytical data available from the server.  
+CubesViewer can be used for data exploration and data auditory, 
+generation of reports, chart design and embedding, 
+and as a (simple) company-wide analytics application.
 
 CubesViewer is a visual interface for the 
-open-source ["Cubes" server](http://databrewery.org/cubes.html) (an OLAP server in Python). 
+open source [Cubes server](http://databrewery.org/cubes.html) (an OLAP server in Python). 
 Purpose is to keep it simple and modular, leveraging the web services 
 provided by Cubes.  
 
-The main focus of CubesViewer is the full GUI application 
-for CubesViewer views creation and management.
-But CubesViewer is mainly an HTML5 application which can also be embedded
-completely or partially in other sites. Views can easily be 
-inserted on other web pages.
 
 Features:
 
-* User Interface allowing for multiple views on-screen. 
 * Cube explorer providing drilldown and cut operations.
 * Supports dimension hierarchies and date filtering.
-* Several charts and diagrams.
+* Several charts and diagrams can be created.
+* View management, cloning, saving and sharing.
+* User Interface allows for multiple views on-screen. 
+* Multiple modes: explore, data series, chart, facts. 
+* Undo / Redo.
 * Multi-user.
-* View management, sharing and saving.
-* Shared notes system to annotate cubes and views.
+* Shared wiki notes system to annotate cubes and views.
 * Views can be embedded in other web sites.
 * Modular and extensible.
 
+Online demos
+------------
 
-Source
-------
+* [CubesViewer Demo page](http://jjmontesl.github.io/cubesviewer/index.html) with one embedded view
+* [CubesViewer Explorer](http://jjmontesl.github.io/cubesviewer/cv.html) with the full application
 
-Github source repository: https://github.com/jjmontesl/cubesviewer
+Download
+------------
+
+CubesViewer requires a [Cubes Server](http://databrewery.org/cubes.html), configured and running, 
+able to serve Cubes OLAP queries. 
+
+* [CubesViewer version 0.9](https://github.com/jjmontesl/cubesviewer/archive/v0.9.zip) support Cubes 0.10.x  
+* Next CubesViewer version will be 0.10, supporting Cubes 1.0 
 
 Requirements
 ------------
 
-CubesViewer requires **[Cubes Server](http://databrewery.org/cubes.html)** 0.11 or later, configured and running, able to serve 
-data cubes. 
+CubesViewer consists of two parts:
 
-Note that **your cubes model should be configured** to add support for CubesViewer features like date filters and descriptions
-(see Documentation below). 
+**CubesViewer Client** is a HTML5 application and can run directly in the browser.
+It can run without server side support as a standalone application, and  
+views can be embedded in other websites. Simply
+download and open the src/htmlviews/gui.html file in your favourite browser.
 
-The **full CubesViewer application** (which includes all features including sharing/saving
-support) includes a Python Django application. You need Django 1.3 in order to run it. 
+The **full CubesViewer application** includes a server side Python Django application which supports features 
+like sharing/saving and user notes. You need Django 1.3 in order to run it, but it is optional 
+(only needed if you wish to use the full application with user authentication, user notes
+or save/load/share support). 
 
-**CubesViewer library is HTML5/Javascript** and should work on most modern browsers
-(it may even work on older browsers). Views can be embedded in other websites.
+Note that **your cubes model shall be configured** to add support for CubesViewer features like date 
+filters and descriptions (see Documentation below). This is optional: CubesViewer will work, 
+but some features like Date Filters will be missing. 
 
 For further information, see the Documentation section below.
 
 Documentation
 -------------
+
+This tool allows users to inspect the different dimensions, measures and
+aggregated data in different ways, allowing you to build tables and charts
+based on the analytical data available from the server. 
 
 * [CubesViewer Documentation](https://github.com/jjmontesl/cubesviewer/blob/master/doc/guide/index.md)
 
@@ -76,20 +91,24 @@ Support
 =======
 
 If you have questions, problems or suggestions, please get in touch. 
-CubesViewer doesn't have a list on its own. Instead, please get in touch 
-through the Cubes project mailing list:
+CubesViewer doesn't have a list on its own. Instead, please use 
+the Cubes project mailing list:
 
+* User group: http://groups.google.com/group/cubes-discuss
 * Report bugs: https://github.com/jjmontesl/cubesviewer/issues
-* Discussion at Google Groups: http://groups.google.com/group/cubes-discuss
 
-If you are using CubesViewer, we'd love to hear from you. Suggestions
-are welcome. 
+If you are using or trying CubesViewer, we'd love to hear from you (tweet #cubesviewer). 
+
+Source
+======
+
+Github source repository: https://github.com/jjmontesl/cubesviewer
 
 Authors
 =======
 
 CubesViewer is written and maintained by Jose Juan Montes 
-<jjmontes@gmail.com> and other contributors. 
+and other contributors. 
 
 See AUTHORS file for more information.
 

@@ -33,11 +33,33 @@ function cubesviewerViews () {
 	this.cubesviewer = cubesviewer;
 	
 	/*
+	 * Shows an error message on a view container.
+	 */
+	this.showFatal = function (container, message) {
+		container.empty().append (
+				'<div class="ui-widget">' +
+				'<div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">' +
+				'<p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>' +
+				'<strong>Error</strong><br/><br/>' + message + 
+				'</p></div></div>'
+		);
+	}
+	
+	/*
 	 * Adds a new clean view for a cube. 
 	 * This accepts parameters as an object or as a serialized string.
 	 */
 	this.createView = function(id, container, type, data) {
 
+		// Check if system is initialized, otherwise
+		// show a friendly error
+		if (cubesviewer.state != "Initialized") {
+			cubesviewer.views.showFatal (container, 'Cannot create CubesViewer view.<br />CubesViewer state is: <b>' + cubesviewer.state + '</b>.<br /><br />Try reloading or contact the administrator.</p>');
+			return null;
+		}
+		
+		// Create view
+		
 		var params = {};
 		
 		if (typeof data == "string") {
@@ -67,6 +89,18 @@ function cubesviewerViews () {
 		$(container).data("cubesviewer-view", view);
 		
 		return view;
+		
+	};
+	
+	/**
+	 * Destroys a view
+	 */
+	this.destroyView = function(view) {
+		
+		// Do cleanup
+		
+		// Trigger destroyed event
+		$(document).trigger("cubesviewerViewDestroyed", [ view ] );
 		
 	};
 	
@@ -119,6 +153,7 @@ function cubesviewerViews () {
 	 * Triggers redraw for a given view.
 	 */
 	this.redrawView = function (view) {
+		if (view == null) return;
 		$(document).trigger ("cubesviewerViewDraw", [ view ]);
 	}
 	
